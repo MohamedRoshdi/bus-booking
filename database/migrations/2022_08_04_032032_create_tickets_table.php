@@ -17,7 +17,6 @@ class CreateTicketsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('bus_id');
             $table->unsignedBigInteger('line_id');
-            $table->unsignedBigInteger('trip_id');
             $table->unsignedBigInteger('seat_id');
 
             $table->foreign('bus_id')
@@ -26,9 +25,6 @@ class CreateTicketsTable extends Migration
             $table->foreign('line_id')
                 ->references('id')
                 ->on('lines');
-            $table->foreign('trip_id')
-                ->references('id')
-                ->on('trips');
             $table->foreign('seat_id')
                 ->references('id')
                 ->on('seats');

@@ -17,6 +17,7 @@ class CreateLinesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('start_city_id');
             $table->unsignedBigInteger('end_city_id');
+            $table->unsignedBigInteger('bus_id');
 
             $table->foreign('start_city_id')
                 ->references('id')
@@ -24,6 +25,9 @@ class CreateLinesTable extends Migration
             $table->foreign('end_city_id')
                 ->references('id')
                 ->on('cities');
+            $table->foreign('bus_id')
+                ->references('id')
+                ->on('buses');
             $table->timestamps();
         });
     }
