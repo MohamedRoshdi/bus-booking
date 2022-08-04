@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTicketsTable extends Migration
+class CreateTripsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateTicketsTable extends Migration
      */
     public function up()
     {
-        Schema::create('tickets', function (Blueprint $table) {
+        Schema::create('trips', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('bus_id');
             $table->unsignedBigInteger('line_id');
-            $table->unsignedBigInteger('seat_id');
-            $table->unsignedBigInteger('trip_id');
+            $table->unsignedBigInteger('start_city_id');
+            $table->unsignedBigInteger('end_city_id');
 
             $table->foreign('bus_id')
                 ->references('id')
@@ -26,12 +26,12 @@ class CreateTicketsTable extends Migration
             $table->foreign('line_id')
                 ->references('id')
                 ->on('lines');
-            $table->foreign('seat_id')
+            $table->foreign('start_city_id')
                 ->references('id')
-                ->on('seats');
-            $table->foreign('trip_id')
+                ->on('cities');
+            $table->foreign('end_city_id')
                 ->references('id')
-                ->on('trips');
+                ->on('cities');
             $table->timestamps();
         });
     }
@@ -43,6 +43,6 @@ class CreateTicketsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tickets');
+        Schema::dropIfExists('trips');
     }
 }

@@ -19,6 +19,7 @@ class CreateTicketsStopsTable extends Migration
             $table->unsignedBigInteger('line_id');
             $table->unsignedBigInteger('seat_id');
             $table->unsignedBigInteger('stop_id');
+            $table->unsignedBigInteger('trip_id');
 
             $table->foreign('bus_id')
                 ->references('id')
@@ -32,6 +33,9 @@ class CreateTicketsStopsTable extends Migration
             $table->foreign('stop_id')
                 ->references('id')
                 ->on('stops');
+            $table->foreign('trip_id')
+                ->references('id')
+                ->on('trips');
             $table->timestamps();
         });
     }
