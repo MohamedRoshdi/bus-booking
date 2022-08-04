@@ -15,6 +15,15 @@ class CreateLinesTable extends Migration
     {
         Schema::create('lines', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('start_city_id');
+            $table->unsignedBigInteger('end_city_id');
+
+            $table->foreign('start_city_id')
+                ->references('id')
+                ->on('cities');
+            $table->foreign('end_city_id')
+                ->references('id')
+                ->on('cities');
             $table->timestamps();
         });
     }

@@ -17,8 +17,6 @@ class CreateTripsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('bus_id');
             $table->unsignedBigInteger('line_id');
-            $table->unsignedBigInteger('start_city_id');
-            $table->unsignedBigInteger('end_city_id');
 
             $table->foreign('bus_id')
                 ->references('id')
@@ -26,12 +24,6 @@ class CreateTripsTable extends Migration
             $table->foreign('line_id')
                 ->references('id')
                 ->on('lines');
-            $table->foreign('start_city_id')
-                ->references('id')
-                ->on('cities');
-            $table->foreign('end_city_id')
-                ->references('id')
-                ->on('cities');
             $table->timestamps();
         });
     }

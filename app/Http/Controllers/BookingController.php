@@ -25,7 +25,7 @@ class BookingController extends Controller
         $data = [];
         $msg = 'Here is the available seats for your trip.';
 
-        $trip = Trip::query()
+        $trip = Trip::join('lines', 'trips.line_id', '=', 'lines.id')
             ->where('start_city_id', $request->start_city_id)
             ->where('end_city_id', $request->end_city_id)
             ->first();
@@ -40,6 +40,7 @@ class BookingController extends Controller
                         ->from('tickets_stops')
                         ->where('tickets_stops.LINE_ID', $trip->line_id)
                         ->where('tickets_stops.BUS_ID', $trip->bus_id)
+                        ->where('tickets_stops.TRIP_ID', $trip->id)
                         ->whereRaw("tickets_stops.SEAT_ID = seats.ID AND tickets_stops.STOP_ID = stops.ID");
                 })->get();
         } else {
@@ -60,8 +61,6 @@ class BookingController extends Controller
      */
     public function bookSeat(Request $request)
     {
-        $line = Line::findOrFail($request->line_id);
-        $stopId = Stop::where('line_id', $line->id)->first()->id ?? 0;
         $seat = Seat::findOrFail($request->seat_id);
         $busId = $seat->bus_id ?? 0;
 
