@@ -11,5 +11,5 @@ class TicketStop extends Model
 
     protected $table = 'tickets_stops';
 
-    protected $fillable = ['line_id', 'seat_id', 'bus_id', 'stop_id'];
+    protected $fillable = ['trip_id', 'line_id', 'seat_id', 'bus_id', 'stop_id'];
 }

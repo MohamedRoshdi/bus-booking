@@ -25,7 +25,7 @@ class BookingController extends Controller
         $data = [];
         $msg = 'Here is the available seats for your trip.';
 
-        $trip = Trip::join('lines', 'trips.line_id', '=', 'lines.id')
+        $trip = Trip::query()
             ->where('start_city_id', $request->start_city_id)
             ->where('end_city_id', $request->end_city_id)
             ->first();
@@ -61,26 +61,33 @@ class BookingController extends Controller
      */
     public function bookSeat(Request $request)
     {
-        $seat = Seat::findOrFail($request->seat_id);
-        $busId = $seat->bus_id ?? 0;
+        $seatId = $request->seat_id;
 
-        $ticket = Ticket::create([
-            'line_id' => $request->line_id,
-            'seat_id' => $request->seat_id,
-            'bus_id' => $busId,
-        ]);
+        $trip = Trip::query()
+            ->where('start_city_id', $request->start_city_id)
+            ->where('end_city_id', $request->end_city_id)
+            ->first();
 
-//        $this->reserveTicketsForAllCitiesInBetween($line, $busId, $seat->id, $stopId);
-//        TicketStop::create([
-//            'line_id' => $line->id,
-//            'seat_id' => $seat->id,
-//            'bus_id' => $busId,
-//            'stop_id' => $stopId,
-//        ]);
-        if ($ticket)
-            $msg = 'Ticket created successfully.';
-        else
-            $msg = 'Something went wrong.';
+        $msg = 'This is no trip exits';
+        $ticket = [];
+        if ($trip) {
+            $lineId = $trip->line_id;
+
+            $ticket = Ticket::create([
+                'trip_id' => $trip->id,
+                'line_id' => $lineId,
+                'seat_id' => $seatId,
+                'bus_id' => $trip->bus_id,
+            ]);
+
+            $this->reserveTicketsForSubTrips($trip, $seatId);
+
+            if ($ticket)
+                $msg = 'Ticket created successfully.';
+            else
+                $msg = 'Something went wrong.';
+        }
+
 
         return response()->json([
             'msg' => $msg,
@@ -89,17 +96,32 @@ class BookingController extends Controller
     }
 
 
-    public function reserveTicketsForAllCitiesInBetween($line, $busId = 0, $seatId = 0, $stopId = 0)
+    public function reserveTicketsForSubTrips($trip, $seatId = 0)
     {
-        foreach ($line->stop_station as $station) {
-            $this->reserveTicketsForAllCitiesInBetween($station, $busId, $seatId, $stopId);
+        $lineId = $trip->line_id;
+        $tripId = $trip->id;
+        $busId = $trip->bus_id;
+        $stopId = Stop::where('line_id', $lineId)->first()->id ?? 0;
 
-            TicketStop::create([
-                'line_id' => $line->id,
+        $ticketStops = [];
+        $ticketStops[] = [
+            'trip_id' => $tripId,
+            'line_id' => $lineId,
+            'seat_id' => $seatId,
+            'bus_id' => $busId,
+            'stop_id' => $stopId,
+        ];
+
+        foreach ($trip->sub_trips as $subTrip) {
+            $ticketStops[] = [
+                'trip_id' => $subTrip->sub_trip_id,
+                'line_id' => $lineId,
                 'seat_id' => $seatId,
                 'bus_id' => $busId,
                 'stop_id' => $stopId,
-            ]);
+            ];
         }
+
+        TicketStop::insert($ticketStops);
     }
 }
